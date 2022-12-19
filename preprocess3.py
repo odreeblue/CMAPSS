@@ -41,4 +41,5 @@ for j in range(1,22): # sensor 총 개수 만큼 반복
     FD002_df['sensor'+str(j)] = gaussian_filter1d(FD002_df['sensor'+str(j)],1) # 필터링한 데이터로 교체
     
 filepath = './'+directory+'/FD002_Reg_Std_Gaussian_data.txt' # 경로 지정
-np.savetxt(filepath,FD002_df,delimiter='\t',newline='\n') # 저장
+np.savetxt(filepath,FD002_df,delimiter='\t',newline='\n',fmt='%1.6e') # 저장
+

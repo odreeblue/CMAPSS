@@ -40,20 +40,32 @@ class Regressor(nn.Module):
 
 
 # 데이터 불러오기
-Engine2_Reg_std_gaussian_target = np.loadtxt('./08_Engine2_RegimeData_STD_Gaussian_Target_Data/Engine2_Reg1_std_gaussian_target.txt',delimiter='\t')
+Engine2_Reg_std_gaussian_target = np.loadtxt('./07_FD002_Reg_Std_Gaussian_Target_data/FD002_Reg_std_Gaussian_Target_data.txt',delimiter='\t')
+
 # Pandas로 변환
-x_columns = list(['unit','timestep','sensor1','sensor2','sensor3',
+x_columns = list(['unit','timestep','set1','set2','set3',
+                    'sensor1','sensor2','sensor3',
                     'sensor4','sensor5','sensor6',
                     'sensor7','sensor8','sensor9',
                     'sensor10','sensor11','sensor12',
                     'sensor13','sensor14','sensor15',
                     'sensor16','sensor17','sensor18',
-                    'sensor19','sensor20','sensor21','target'])
+                    'sensor19','sensor20','sensor21',
+                    'type','regime','target'])
 df = pd.DataFrame(Engine2_Reg_std_gaussian_target,columns=x_columns)
+print(df)
+TrainData = df[(df['type']==0)&(df['regime']==5)] # Train Data & Regime = 6  데이터 추출
 
-X = df.drop(labels=['unit','timestep','target'],axis=1).to_numpy()
-Y = df['target'].to_numpy().reshape((-1,1))
+Train_X = TrainData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
+Train_Y = TrainData['target'].to_numpy().reshape((-1,1))
 
+# TestData = df[(df['type']==1)&(df['regime']==5)&(df['unit']==51)] # Test Data & Regime = 6 & 51번 엔진 데이터 추출
+TestData = df[(df['type']==1)&(df['unit']==51)] # Test Data & Regime = 6 & 51번 엔진 데이터 추출
+print(TestData)
+Test_X = TestData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
+Test_Y = TestData['target'].to_numpy().reshape((-1,1))
+
+Test_Timestep = TestData['timestep'].to_numpy().reshape((-1,1))
 # 전체 데이터를 학습 데이터와 평가 데이터로 나눈다.
 # 기준으로 잡은 논문이 전체 데이터를 50%, 50%로 나눴기 때문에 test size를 0.5로 설정한다.
 
@@ -61,8 +73,11 @@ Y = df['target'].to_numpy().reshape((-1,1))
 #X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1)
 
 # 학습 데이터, 시험 데이터 배치 형태로 구축하기
-trainsets = TensorData(X, Y)
-trainloader = torch.utils.data.DataLoader(trainsets, batch_size=32, shuffle=True)
+trainsets = TensorData(Train_X, Train_Y)
+trainloader = torch.utils.data.DataLoader(trainsets, batch_size=256, shuffle=False)
+
+testsets = TensorData(Test_X, Test_Y)
+testloader = torch.utils.data.DataLoader(testsets, batch_size=256, shuffle=False)
 
 
 model = torch.load('test1.pt')
@@ -90,10 +105,25 @@ def evaluation(dataloader):
     
     return rmse,actual,predictions
 
-train_rmse, actualValue, predValue = evaluation(trainloader) # 원래는 이렇게 하면 안되지만, 비교를 위해서 train을 넣어서 본다. 
+# train_rmse, train_actualValue, train_predValue = evaluation(trainloader) # 원래는 이렇게 하면 안되지만, 비교를 위해서 train을 넣어서 본다. 
+test_rmse, test_actualValue, test_predValue = evaluation(testloader)
+# plt.plot(train_predValue,train_actualValue,'.')
+# plt.show()
+# plt.cla()
 
-plt.plot(predValue,actualValue,'.')
+# print(f'train rmse:{train_rmse}')
+
+
+plt.plot(test_predValue,test_actualValue,'.')
 plt.show()
+plt.cla()
 
+print(f'train rmse:{test_rmse}')
 
-print(f'train rmse:{train_rmse}')
+print(Test_Timestep.shape)
+print(test_actualValue.shape)
+print(test_predValue.shape)
+
+plt.plot(Test_Timestep,test_actualValue,'r')
+plt.plot(Test_Timestep,test_predValue,'b')
+plt.show()

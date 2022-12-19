@@ -27,21 +27,28 @@ FD002_df = pd.DataFrame(FD002,columns=x_columns_)
 # 2) FD002 데이터의 Unit 열과 Timestep 열을 DataFrame으로 변환
 
 # 3) 최대 Unit 번호 구하기
-maxUnitNum_train = FD002_df[(FD002_df['type']==0)]['unit'].max() # maybe 260개
+maxUnitNum_train = FD002_df[(FD002_df['type']==0)]['unit'].max() # maybe 260
 
-print("maxUnitNum :",maxUnitNum_train)
+print("maxUnitNum_Train :",maxUnitNum_train)
 # 4) Unit별 최대 사이클수 구하기
 maxCycle_train = dict()
 for i in range(1,int(maxUnitNum_train)+1):
     maxCycle_train[i] = FD002_df[(FD002_df['unit']==i)& (FD002_df['type']==0)].max()['timestep']
 
-maxCycle_test = dict()
+
+maxUnitNum_test = FD002_df[(FD002_df['type']==1)]['unit'].max() #maybe 259
+print("maxUnitNum_Test :",maxUnitNum_test)
+
 FD002_TestRUL = np.loadtxt('./11_Testdata/RUL_FD002.txt',delimiter='\t',dtype='double')
-# print(FD002_TestRUL.shape)#259
-print(FD002_TestRUL.max())#194
-maxUnitNum_test = 259
-for i in range(i,int(maxUnitNum_test)+1):
-    maxCycle_test[i] = FD002_TestRUL[i]
+maxCycle_test = dict()
+
+for i in range(1,int(maxUnitNum_test)+1):
+    maxCycle_test[i] = FD002_df[(FD002_df['unit']==i)& (FD002_df['type']==1)].max()['timestep'] + FD002_TestRUL[i-1]
+
+print(maxCycle_test[1])
+print(maxCycle_test[2])
+print(maxCycle_test[3])
+
 
 # 6) target값 계산해서 열 추가하기
 
@@ -70,4 +77,4 @@ else:
 
 for i in range(1,7): # regime 1~6까지 반복
     filepath = './'+directory+'/FD002_Reg_Std_Gaussian_Target_data.txt' # 경로 지정
-    np.savetxt(filepath,FD002_df,delimiter='\t',newline='\n') # 저장
+    np.savetxt(filepath,FD002_df,delimiter='\t',newline='\n',fmt='%1.6e') # 저장

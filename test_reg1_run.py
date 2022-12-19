@@ -43,21 +43,28 @@ class Regressor(nn.Module):
 # 주의 사항
 # 드랍아웃은 과적합(overfitting)을 방지하기 위해 노드의 일부를 배제하고 계산하는 방식이기 때문에 절대로 출력층에 사용해서는 안 된다.
 # 데이터 불러오기
-Engine2_Reg_std_gaussian_target = np.loadtxt('./07_FD002_Reg_Std_Gaussian_Target_data/Engine2_Reg1_std_gaussian_target.txt',delimiter='\t')
+Engine2_Reg_std_gaussian_target = np.loadtxt('./07_FD002_Reg_Std_Gaussian_Target_data/FD002_Reg_std_Gaussian_Target_data.txt',delimiter='\t')
 
 # Pandas로 변환
-x_columns = list(['unit','timestep','sensor1','sensor2','sensor3',
+x_columns = list(['unit','timestep','set1','set2','set3',
+                    'sensor1','sensor2','sensor3',
                     'sensor4','sensor5','sensor6',
                     'sensor7','sensor8','sensor9',
                     'sensor10','sensor11','sensor12',
                     'sensor13','sensor14','sensor15',
                     'sensor16','sensor17','sensor18',
-                    'sensor19','sensor20','sensor21','target'])
+                    'sensor19','sensor20','sensor21',
+                    'type','regime','target'])
 df = pd.DataFrame(Engine2_Reg_std_gaussian_target,columns=x_columns)
+print(df)
+TrainData = df[(df['type']==0)&(df['regime']==5)] # Train Data & Regime = 6  데이터 추출
 
-X = df.drop(labels=['unit','timestep','target'],axis=1).to_numpy()
-Y = df['target'].to_numpy().reshape((-1,1))
+Train_X = TrainData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
+Train_Y = TrainData['target'].to_numpy().reshape((-1,1))
 
+TestData = df[(df['type']==1)&(df['regime']==5)] # Test Data & Regime = 6  데이터 추출
+Test_X = TestData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
+Test_Y = TestData['target'].to_numpy().reshape((-1,1))
 # 전체 데이터를 학습 데이터와 평가 데이터로 나눈다.
 # 기준으로 잡은 논문이 전체 데이터를 50%, 50%로 나눴기 때문에 test size를 0.5로 설정한다.
 
@@ -65,8 +72,8 @@ Y = df['target'].to_numpy().reshape((-1,1))
 #X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1)
 
 # 학습 데이터, 시험 데이터 배치 형태로 구축하기
-trainsets = TensorData(X, Y)
-trainloader = torch.utils.data.DataLoader(trainsets, batch_size=32, shuffle=True)
+trainsets = TensorData(Train_X, Train_Y)
+trainloader = torch.utils.data.DataLoader(trainsets, batch_size=256, shuffle=True)
 
 #testsets = TensorData(X_test, Y_test)
 #testloader = torch.utils.data.DataLoader(testsets, batch_size=32, shuffle=False)
@@ -81,9 +88,12 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-7)
 loss_ = [] # loss를 저장할 리스트.
 n = len(trainloader)
 
-for epoch in range(100):
+EPOCH = 100
+
+
+for epoch in range(EPOCH):
     running_loss = 0.0 # 한 에폭이 돌 때 그안에서 배치마다 loss가 나온다. 즉 한번 학습할 때 그렇게 쪼개지면서 loss가 다 나오니 MSE를 구하기 위해서 사용한다.
-    print("현재 학습 진행 "+str(epoch)+"/100")
+    print("현재 학습 진행 "+str(epoch)+"/"+str(EPOCH))
     for i, data in enumerate(trainloader, 0): # 무작위로 섞인 32개의 데이터가 담긴 배치가 하나씩 들어온다.
         
         inputs, values = data # data에는 X, Y가 들어있다.

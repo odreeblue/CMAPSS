@@ -19,7 +19,7 @@ import seaborn as sn
 
 print('--------------------------------------')
 print('-------------데이터 로드--------------')
-FD002 = np.loadtxt('./01_FD002_Reg_data/FD002_Reg_data.txt',delimiter='\t',dtype='double')
+FD002 = np.loadtxt('./01_FD002_Reg_data/FD002_Reg_data.txt',delimiter='\t',dtype='float')
 x_columns_ = list(['unit','timestep','set1','set2','set3',
                     'sensor1','sensor2','sensor3',
                     'sensor4','sensor5','sensor6',
@@ -86,7 +86,7 @@ else:
 
 
 filepath = './'+directory+'/FD002_Reg_Std_data.txt'
-np.savetxt(filepath,FD002_df,delimiter='\t',newline='\n')
+np.savetxt(filepath,FD002_df,delimiter='\t',newline='\n',fmt='%1.6e')
 
 
 

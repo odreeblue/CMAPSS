@@ -110,7 +110,7 @@ if os.path.isdir(directory):
 else:
     print(directory+'폴더 없음, 생성함')
     os.makedirs(directory)
-np.savetxt('./01_FD002_Reg_data/FD002_Reg_data.txt',FD002_df,delimiter='\t',newline='\n')
+np.savetxt('./01_FD002_Reg_data/FD002_Reg_data.txt',FD002_df,delimiter='\t',newline='\n',fmt='%1.6e')
 
 
 
