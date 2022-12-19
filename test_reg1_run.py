@@ -8,7 +8,8 @@ from torch.utils.data import DataLoader, Dataset      # 데이터를 모델에 �
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error        # regression 문제의 모델 성능 측정을 위해서 MSE를 불러온다.
 # torch의 Dataset 을 상속.
 class TensorData(Dataset):
 
@@ -42,7 +43,7 @@ class Regressor(nn.Module):
 # 주의 사항
 # 드랍아웃은 과적합(overfitting)을 방지하기 위해 노드의 일부를 배제하고 계산하는 방식이기 때문에 절대로 출력층에 사용해서는 안 된다.
 # 데이터 불러오기
-Engine2_Reg_std_gaussian_target = np.loadtxt('./08_Engine2_RegimeData_STD_Gaussian_Target_Data/Engine2_Reg1_std_gaussian_target.txt',delimiter='\t')
+Engine2_Reg_std_gaussian_target = np.loadtxt('./07_FD002_Reg_Std_Gaussian_Target_data/Engine2_Reg1_std_gaussian_target.txt',delimiter='\t')
 
 # Pandas로 변환
 x_columns = list(['unit','timestep','sensor1','sensor2','sensor3',
@@ -59,13 +60,13 @@ Y = df['target'].to_numpy().reshape((-1,1))
 
 # 전체 데이터를 학습 데이터와 평가 데이터로 나눈다.
 # 기준으로 잡은 논문이 전체 데이터를 50%, 50%로 나눴기 때문에 test size를 0.5로 설정한다.
-from sklearn.model_selection import train_test_split
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1)
+
+#X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1)
 
 # 학습 데이터, 시험 데이터 배치 형태로 구축하기
-trainsets = TensorData(X_train, Y_train)
-trainloader = torch.utils.data.DataLoader(trainsets, batch_size=500, shuffle=True)
+trainsets = TensorData(X, Y)
+trainloader = torch.utils.data.DataLoader(trainsets, batch_size=32, shuffle=True)
 
 #testsets = TensorData(X_test, Y_test)
 #testloader = torch.utils.data.DataLoader(testsets, batch_size=32, shuffle=False)
@@ -80,11 +81,11 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-7)
 loss_ = [] # loss를 저장할 리스트.
 n = len(trainloader)
 
-for epoch in range(400):
+for epoch in range(100):
     running_loss = 0.0 # 한 에폭이 돌 때 그안에서 배치마다 loss가 나온다. 즉 한번 학습할 때 그렇게 쪼개지면서 loss가 다 나오니 MSE를 구하기 위해서 사용한다.
-
+    print("현재 학습 진행 "+str(epoch)+"/100")
     for i, data in enumerate(trainloader, 0): # 무작위로 섞인 32개의 데이터가 담긴 배치가 하나씩 들어온다.
-    
+        
         inputs, values = data # data에는 X, Y가 들어있다.
 
         optimizer.zero_grad() # 최적화 초기화.
@@ -98,14 +99,11 @@ for epoch in range(400):
   
     loss_.append(running_loss/n) # MSE(Mean Squared Error) 계산
 
-#outputs = model(X_train)
-
-#plt.plot(Y_train,outputs)
-
-trainsets = TensorData(X_train, Y_train)
-trainloader = torch.utils.data.DataLoader(trainsets, batch_size=500, shuffle=True)
+torch.save(model,'test1.pt')
 
 plt.plot(loss_)
 plt.title('Loss')
 plt.xlabel('epoch')
 plt.show()
+
+
