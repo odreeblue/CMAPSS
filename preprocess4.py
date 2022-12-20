@@ -63,10 +63,10 @@ print(FD002_df.shape[0])
 for i in range(FD002_df.shape[0]):
     # print(i)
     if FD002_df.loc[i,'type']==0: # train
-        FD002_df.loc[i,'target'] = maxCycle_train[FD002_df.loc[i,'unit']]-FD002_df.loc[i,'timestep']
+        FD002_df.loc[i,'target'] = 130 if maxCycle_train[FD002_df.loc[i,'unit']]-FD002_df.loc[i,'timestep'] > 130 else maxCycle_train[FD002_df.loc[i,'unit']]-FD002_df.loc[i,'timestep']
     # elif FD002_df.loc[i,'type']==1: # test
     else:
-        FD002_df.loc[i,'target'] = maxCycle_test[FD002_df.loc[i,'unit']]-FD002_df.loc[i,'timestep']
+        FD002_df.loc[i,'target'] = 130 if maxCycle_test[FD002_df.loc[i,'unit']]-FD002_df.loc[i,'timestep'] > 130 else maxCycle_test[FD002_df.loc[i,'unit']]-FD002_df.loc[i,'timestep']
 
 directory = '07_FD002_Reg_Std_Gaussian_Target_data'
 if os.path.isdir(directory):

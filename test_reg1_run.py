@@ -62,7 +62,7 @@ TrainData = df[(df['type']==0)&(df['regime']==5)] # Train Data & Regime = 6  데
 Train_X = TrainData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
 Train_Y = TrainData['target'].to_numpy().reshape((-1,1))
 
-TestData = df[(df['type']==1)&(df['regime']==5)] # Test Data & Regime = 6  데이터 추출
+TestData = df[(df['type']==0)&(df['regime']==5)&(df['unit']==50)] # Test Data & Regime = 6  데이터 추출
 Test_X = TestData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
 Test_Y = TestData['target'].to_numpy().reshape((-1,1))
 # 전체 데이터를 학습 데이터와 평가 데이터로 나눈다.
@@ -88,7 +88,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-7)
 loss_ = [] # loss를 저장할 리스트.
 n = len(trainloader)
 
-EPOCH = 100
+EPOCH = 200
 
 
 for epoch in range(EPOCH):

@@ -60,7 +60,7 @@ Train_X = TrainData.drop(labels=['unit','timestep','set1','set2','set3','type','
 Train_Y = TrainData['target'].to_numpy().reshape((-1,1))
 
 # TestData = df[(df['type']==1)&(df['regime']==5)&(df['unit']==51)] # Test Data & Regime = 6 & 51번 엔진 데이터 추출
-TestData = df[(df['type']==1)&(df['unit']==51)] # Test Data & Regime = 6 & 51번 엔진 데이터 추출
+TestData = df[(df['type']==0)&(df['unit']==50)&(df['regime']==1)] # Test Data & Regime = 6 & 51번 엔진 데이터 추출
 print(TestData)
 Test_X = TestData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
 Test_Y = TestData['target'].to_numpy().reshape((-1,1))
@@ -124,6 +124,8 @@ print(Test_Timestep.shape)
 print(test_actualValue.shape)
 print(test_predValue.shape)
 
-plt.plot(Test_Timestep,test_actualValue,'r')
-plt.plot(Test_Timestep,test_predValue,'b')
+plt.plot(test_actualValue,'b')
+plt.plot(test_predValue,'r')
+plt.xlim((0,40))
+plt.ylim((0,150))
 plt.show()
