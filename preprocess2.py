@@ -4,12 +4,12 @@
 
 '''
 논문    My      센서
-1       5       [2,3,4,6,7,8,9,11,13,14,15,17,21]
-2       2       [2,3,4,7,8,9,11,12,13,14,15,17,20]
-3       0       [2,3,4,7,8,9,11,12,13,14,15,17,20,21]
-4       3       [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,21]
-5       4       [2,3,4,6,7,8,9,11,12,13,14,15,17,20,21]
-6       1       [2,3,4,7,8,9,11,12,13,14,15,17,20]
+1       1       [2,3,4,6,7,8,9,11,13,14,15,17,21]
+2       3       [2,3,4,7,8,9,11,12,13,14,15,17,20]
+3       4       [2,3,4,7,8,9,11,12,13,14,15,17,20,21]
+4       5       [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,21]
+5       2       [2,3,4,6,7,8,9,11,12,13,14,15,17,20,21]
+6       6       [2,3,4,7,8,9,11,12,13,14,15,17,20]
 '''
 
 import numpy as np
@@ -112,10 +112,10 @@ else:
 
 
 # x = Engine2_Reg6_std_df['timestep']
-x = FD002_df[(FD002_df['unit'] == 2) &(FD002_df['type']==0) & (FD002_df['regime']==1)]['timestep']
+x = FD002_df[(FD002_df['unit'] == 2) &(FD002_df['type']==0) & (FD002_df['regime']==0)]['timestep']
 for i in sensorlist:
     # Engine2_Reg1_sensornum = Engine2_Reg6_std_df['sensor'+str(i)]
-    Engine2_Reg1_sensornum = FD002_df[(FD002_df['unit']==2)&(FD002_df['type']==0) & (FD002_df['regime']==1)]['sensor'+str(i)]
+    Engine2_Reg1_sensornum = FD002_df[(FD002_df['unit']==2)&(FD002_df['type']==0) & (FD002_df['regime']==0)]['sensor'+str(i)]
     Engine2_Reg1_sensornum_filter = gaussian_filter1d(Engine2_Reg1_sensornum,1)
     plt.plot(x,Engine2_Reg1_sensornum,'ok',ms = 2,label='original data') # ms = markersize
     plt.plot(x,Engine2_Reg1_sensornum_filter,'-r',label='filtered data, sigma =1')

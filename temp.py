@@ -8,10 +8,8 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 # 데이터 불러오기
-Engine2_Reg_std_gaussian_target = np.loadtxt('./07_FD002_Reg_Std_Gaussian_Target_data/FD002_Reg_std_Gaussian_Target_data.txt',delimiter='\t')
-
-# Pandas로 변환
-x_columns = list(['unit','timestep','set1','set2','set3',
+FD002 = np.loadtxt('./01_FD002_Reg_data/FD002_Reg_data.txt',delimiter='\t',dtype='float')
+x_columns_ = list(['unit','timestep','set1','set2','set3',
                     'sensor1','sensor2','sensor3',
                     'sensor4','sensor5','sensor6',
                     'sensor7','sensor8','sensor9',
@@ -19,9 +17,10 @@ x_columns = list(['unit','timestep','set1','set2','set3',
                     'sensor13','sensor14','sensor15',
                     'sensor16','sensor17','sensor18',
                     'sensor19','sensor20','sensor21',
-                    'type','regime','target'])
-df = pd.DataFrame(Engine2_Reg_std_gaussian_target,columns=x_columns)
+                    'type','regime','target']) # type -> train : 0, test : 1
+FD002_df = pd.DataFrame(FD002,columns=x_columns_)
 print(df)
+'''
 TrainData = df[(df['type']==0)&(df['regime']==5)] # Train Data & Regime = 6  데이터 추출
 
 Train_X = TrainData.drop(labels=['unit','timestep','set1','set2','set3','type','regime','target'],axis=1).to_numpy()
@@ -34,4 +33,20 @@ Test_X = TestData.drop(labels=['unit','timestep','set1','set2','set3','type','re
 Test_Y = TestData['target'].to_numpy().reshape((-1,1))
 
 Test_Timestep = TestData['timestep'].to_numpy().reshape((-1,1))
-print(Test_Timestep)
+print(Test_Timestep)'''
+
+from sklearn.cluster import KMeans
+
+
+x_columns = ['sensor1','sensor2','sensor3',
+                'sensor4','sensor5','sensor6',
+                'sensor7','sensor8','sensor9',
+                'sensor10','sensor11','sensor12',
+                'sensor13','sensor14','sensor15',
+                'sensor16','sensor17','sensor18',
+                'sensor19','sensor20','sensor21']
+
+model = KMeans(n_clusters=6, random_state=0, n_init=100) # n_init: 초기 중심 위치 시도 횟수
+                                                             # random_state : 시드값
+cluster_labels = model.fit_predict(FD002_df[x_columns]) # X 컬럼으로 지정된 필드갑으로 피팅
+    

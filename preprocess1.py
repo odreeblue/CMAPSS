@@ -119,12 +119,12 @@ print('--------------------------------------')
 print('-------------논문에 있는 image 생성을 위한 조건식 부여--------------')
 # Engine2_Reg6_std_df[Engine2_Reg6_std_df['unit']==2 ]['sensor'+str(i)]
 regime = dict()
-regime[1] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==0) * (FD002_df['type']==0)]
-regime[2] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==1) * (FD002_df['type']==0)]
-regime[3] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==2) * (FD002_df['type']==0)]
-regime[4] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==3) * (FD002_df['type']==0)]
-regime[5] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==4) * (FD002_df['type']==0)]
-regime[6] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==5) * (FD002_df['type']==0)]
+regime[1] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==0) & (FD002_df['type']==0)]
+regime[2] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==1) & (FD002_df['type']==0)]
+regime[3] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==2) & (FD002_df['type']==0)]
+regime[4] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==3) & (FD002_df['type']==0)]
+regime[5] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==4) & (FD002_df['type']==0)]
+regime[6] = FD002_df[(FD002_df['unit']==2) & (FD002_df['regime']==5) & (FD002_df['type']==0)]
 
 # print(regime[1].shape)
 print('--------------------------------------')
@@ -197,6 +197,6 @@ for i in range(1,7):
     command1 = 'sn.heatmap(spearmanValue'+str(i)+'_df, vmax = 0.4, vmin=0,annot=True,cmap="OrRd")'
     eval(command1)
     plt.title('regime'+str(i))
-    plt.savefig('./'+directory+'/spearmanValue'+str(i)+'.png', bbox_inches='tight')
+    plt.savefig('./'+directory+'/spearmanValue'+str(i)+'_2.png', bbox_inches='tight')
     plt.cla()
 
