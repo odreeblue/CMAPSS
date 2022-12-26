@@ -19,7 +19,10 @@ x_columns_ = list(['unit','timestep','set1','set2','set3',
                     'sensor19','sensor20','sensor21',
                     'type','regime','target']) # type -> train : 0, test : 1
 FD002_df = pd.DataFrame(FD002,columns=x_columns_)
-print(df)
+print(FD002_df)
+FD002_std = np.loadtxt('./07_FD002_Reg_Std_Gaussian_Target_data/FD002_Reg_Std_Gaussian_Target_data.txt',delimiter='\t',dtype='float')
+FD002_std_df = pd.DataFrame(FD002_std,columns=x_columns_)
+print(FD002_std_df)
 '''
 TrainData = df[(df['type']==0)&(df['regime']==5)] # Train Data & Regime = 6  데이터 추출
 
@@ -33,7 +36,7 @@ Test_X = TestData.drop(labels=['unit','timestep','set1','set2','set3','type','re
 Test_Y = TestData['target'].to_numpy().reshape((-1,1))
 
 Test_Timestep = TestData['timestep'].to_numpy().reshape((-1,1))
-print(Test_Timestep)'''
+print(Test_Timestep)
 
 from sklearn.cluster import KMeans
 
@@ -49,4 +52,4 @@ x_columns = ['sensor1','sensor2','sensor3',
 model = KMeans(n_clusters=6, random_state=0, n_init=100) # n_init: 초기 중심 위치 시도 횟수
                                                              # random_state : 시드값
 cluster_labels = model.fit_predict(FD002_df[x_columns]) # X 컬럼으로 지정된 필드갑으로 피팅
-    
+    '''

@@ -12,7 +12,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error        # regression 문제의 모델 성능 측정을 위해서 MSE를 불러온다.
 # torch의 Dataset 을 상속.
 class TensorData(Dataset):
-
     def __init__(self, x_data, y_data):
         self.x_data = torch.FloatTensor(x_data)
         self.y_data = torch.FloatTensor(y_data)
@@ -36,10 +35,9 @@ class Regressor(nn.Module):
     def forward(self, x): # 모델 연산의 순서를 정의
         x = F.relu(self.fc1(x)) # Linear 계산 후 활성화 함수 ReLU를 적용한다.  
         x = self.dropout(F.relu(self.fc2(x))) # 은닉층2에서 드랍아웃을 적용한다.(즉, 30개의 20%인 6개의 노드가 계산에서 제외된다.)
-        x = F.relu(self.fc3(x)) # Linear 계산 후 활성화 함수 ReLU를 적용한다.  
-      
+        x = F.relu(self.fc3(x)) # Linear 계산 후 활성화 함수 ReLU를 적용한다.        
         return x
-    
+
 # 주의 사항
 # 드랍아웃은 과적합(overfitting)을 방지하기 위해 노드의 일부를 배제하고 계산하는 방식이기 때문에 절대로 출력층에 사용해서는 안 된다.
 # 데이터 불러오기
