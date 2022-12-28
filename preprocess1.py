@@ -4,8 +4,6 @@
 #  1.1 K-means 군집화 알고리즘 적용
 #  1.2 논문과 같은 사진(그래프) 도출
 
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
