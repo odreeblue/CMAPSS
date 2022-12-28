@@ -31,12 +31,12 @@ class Regressor(nn.Module):
         self.fc1 = nn.Linear(input_dim, hidden1_dim, bias=True) # 입력층(13) -> 은닉층1(50)으로 가는 연산
         self.fc2 = nn.Linear(hidden1_dim, hidden2_dim, bias=True) # 은닉층1(50) -> 은닉층2(30)으로 가는 연산
         self.fc3 = nn.Linear(hidden2_dim, 1, bias=True) # 은닉층2(30) -> 출력층(1)으로 가는 연산
-        #self.dropout = nn.Dropout(0.2) # 연산이 될 때마다 20%의 비율로 랜덤하게 노드를 없앤다.
+        self.dropout = nn.Dropout(0.2) # 연산이 될 때마다 20%의 비율로 랜덤하게 노드를 없앤다.
 
     def forward(self, x): # 모델 연산의 순서를 정의
         x = F.relu(self.fc1(x)) # Linear 계산 후 활성화 함수 ReLU를 적용한다.  
-        # x = self.dropout(F.relu(self.fc2(x))) # 은닉층2에서 드랍아웃을 적용한다.(즉, 30개의 20%인 6개의 노드가 계산에서 제외된다.)
-        x = F.relu(self.fc2(x))
+        x = self.dropout(F.relu(self.fc2(x))) # 은닉층2에서 드랍아웃을 적용한다.(즉, 30개의 20%인 6개의 노드가 계산에서 제외된다.)
+        # x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x)) # Linear 계산 후 활성화 함수 ReLU를 적용한다.        
         return x
 sensor = dict()
@@ -167,6 +167,13 @@ optimizer[3] = optim.Adam(model[3].parameters(), lr=0.001, weight_decay=1e-7)
 optimizer[4] = optim.Adam(model[4].parameters(), lr=0.001, weight_decay=1e-7)
 optimizer[5] = optim.Adam(model[5].parameters(), lr=0.001, weight_decay=1e-7)
 optimizer[6] = optim.Adam(model[6].parameters(), lr=0.001, weight_decay=1e-7)
+# optimizer[1] = optim.LBFGS(model[1].parameters(), history_size=10, max_iter=4)
+# optimizer[2] = optim.LBFGS(model[2].parameters(), history_size=10, max_iter=4)
+# optimizer[3] = optim.LBFGS(model[3].parameters(), history_size=10, max_iter=4)
+# optimizer[4] = optim.LBFGS(model[4].parameters(), history_size=10, max_iter=4)
+# optimizer[5] = optim.LBFGS(model[5].parameters(), history_size=10, max_iter=4)
+# optimizer[6] = optim.LBFGS(model[6].parameters(), history_size=10, max_iter=4)
+
 
 loss_ = dict()
 loss_[1]=[]
