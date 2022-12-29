@@ -20,8 +20,9 @@ class preprocess:
                 'sensor13','sensor14','sensor15',
                 'sensor16','sensor17','sensor18',
                 'sensor19','sensor20','sensor21']
-        self.data = data
-        
+        self.data = data.copy()
+        self.U2S2_Image_data = data.copy()
+        self.Spearman_Image_data = data.copy()
     def Clustering_Kmeans(self):
         start = time()
         model = KMeans(n_clusters=6, random_state=0, n_init=100) # n_init: 초기 중심 위치 시도 횟수
@@ -36,6 +37,8 @@ class preprocess:
         end = time()
         print('Clustering time elapsed',end-start)
         self.data['regime_new']=cluster_labels
+        self.U2S2_Image_data['regime_new']=cluster_labels
+        self.Spearman_Image_data['regime_new'] = cluster_labels
         # return cluster_labels
 
     def Standard_Scaler(self):
@@ -71,6 +74,10 @@ class preprocess:
                 self.data.loc[i,'target'] = 130 if maxCycle_train[self.data.loc[i,'unit']]-self.data.loc[i,'timestep'] > 130 else maxCycle_train[self.data.loc[i,'unit']]-self.data.loc[i,'timestep']
             else:
                 self.data.loc[i,'target'] = 130 if maxCycle_test[self.data.loc[i,'unit']]-self.data.loc[i,'timestep'] > 130 else maxCycle_test[self.data.loc[i,'unit']]-self.data.loc[i,'timestep']
+        
+        self.Spearman_Image_data['target'] = self.data['target']
+
+
     def Save_data(self,directory):
         Directory = directory
         if os.path.isdir(Directory):
@@ -93,10 +100,11 @@ class make_image:
                     'sensor13','sensor14','sensor15',
                     'sensor16','sensor17','sensor18',
                     'sensor19','sensor20','sensor21'])
-    def Image_Unit2_Sensor2(self,directory):
+    def Image_Unit2_Sensor2(self,U2S2_Image_data,directory):
         regime = dict()
         for i in range(1,7):
-            regime[i] = self.data[(self.data['unit']==2) & (self.data['regime_orig']==i-1) & (self.data['type']==0)]
+            regime[i] = U2S2_Image_data[(U2S2_Image_data['unit']==2) & (U2S2_Image_data['regime_orig']==i-1) & (U2S2_Image_data['type']==0)]
+            # print(regime[i].shape)
         
         if os.path.isdir(directory):
             print(directory+'폴더 있음')
@@ -110,10 +118,11 @@ class make_image:
             plt.savefig('./'+directory+'/regime'+str(i)+'.png', bbox_inches='tight') #논문엔 1번 센서라고 나왔지만, 2번 센서임
             plt.cla()
 
-    def Image_SpearmanValue(self,directory,type):
+    def Image_SpearmanValue(self,Spearman_Image_data,directory,type):
         regime = dict()
         for i in range(1,7):
-            regime[i] = self.data[(self.data['regime_orig']==i-1)]
+            regime[i] = Spearman_Image_data[(Spearman_Image_data['regime_orig']==i-1)]
+            print(regime[i].shape)
 
         if type==0:
             spearmanValue = dict()
@@ -122,23 +131,26 @@ class make_image:
             rho = 0
             p_val =0
             for regNum in range(1,7):
-                for i in range(1,22):
-                    for j in range(1,22):
+                for i in self.sensorlist:
+                    for j in self.sensorlist:
                         #rho, p_val = stats.spearmanr(regime[regNum]['sensor'+str(i)],regime[regNum]['sensor'+str(j)])
-                        command1 = 'rho,p_val = stats.spearmanr(regime['+str(regNum)+'][\'sensor'+str(i)+'\'],regime['+str(regNum)+'][\'sensor'+str(j)+'\'])'
-                        exec(command1)
+                        # command1 = 'rho,p_val = stats.spearmanr(regime['+str(regNum)+'][\'sensor'+str(i)+'\'],regime['+str(regNum)+'][\'sensor'+str(j)+'\'])'
+                        rho, p_val = stats.spearmanr(regime[regNum][i],regime[regNum][j])
+                        # exec(command1)
+                        print('regime: ',str(regNum),' ',i,'--',j,' 의 값은 ->',str(rho))
                         if math.isnan(rho):
                             rho = 0
                         #spearmanValue[i-1,j-1] = rho
-                        command2 = "spearmanValue["+str(regNum)+"]["+str(i-1)+","+str(j-1)+"]=abs(rho)"
-                        exec(command2)
+                        # command2 = "spearmanValue["+str(regNum)+"]["+str(i-1)+","+str(j-1)+"]=abs(rho)"
+                        spearmanValue[regNum][int(i[6:])-1,int(j[6:])-1]=abs(rho)
+                        # exec(command2)
 
             spearmanValue_df = dict()
             for i in range(1,7):
                 spearmanValue_df[i]= pd.DataFrame(spearmanValue[i], index = [i for i in self.sensorlist], columns = [i for i in self.sensorlist])   
-                if i == 1:
-                    sn.heatmap(spearmanValue_df[i], vmax = 0.4, vmin=0,annot=True,cmap="OrRd")
-                    plt.show()
+                # if i == 1:
+                #     sn.heatmap(spearmanValue_df[i], vmax = 0.4, vmin=0,annot=True,cmap="OrRd")
+                #     plt.show()
         elif type==1:
             spearmanValue = dict()
             for i in range(1,7):
@@ -146,16 +158,18 @@ class make_image:
             rho = 0
             p_val =0
             for regNum in range(1,7):
-                for i in range(1,22):
+                for i in self.sensorlist:
                     
                     #rho, p_val = stats.spearmanr(regime[regNum]['sensor'+str(i)],regime[regNum]['sensor'+str(j)])
-                    command1 = 'rho,p_val = stats.spearmanr(regime['+str(regNum)+'][\'sensor'+str(i)+'\'],regime['+str(regNum)+'][\'target\'])'
-                    exec(command1)
+                    # command1 = 'rho,p_val = stats.spearmanr(regime['+str(regNum)+'][\'sensor'+str(i)+'\'],regime['+str(regNum)+'][\'target\'])'
+                    rho,p_val = stats.spearmanr(regime[regNum][i],regime[regNum]['target'])
+                    # exec(command1)
                     if math.isnan(rho):
                         rho = 0
                     #spearmanValue[i-1,j-1] = rho
-                    command2 = "spearmanValue["+str(regNum)+"]["+str(i-1)+",0]=abs(rho)"
-                    exec(command2)
+                    # command2 = "spearmanValue["+str(regNum)+"]["+str(i-1)+",0]=abs(rho)"
+                    spearmanValue[regNum][int(i[6:])-1,0]=abs(rho)
+                    # exec(command2)
 
             spearmanValue_df = dict()
             for i in range(1,7):

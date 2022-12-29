@@ -67,8 +67,8 @@ makeImage = make_image(preprocessor.data)
 
     # 2.1 Train 데이터의 Unit2번->Sensor2번 "데이터 1~6번 그룹" image 출력
 directory = '[03]_image/[01]_Unit2_Sensor2'
-makeImage.Image_Unit2_Sensor2(directory)
-
+makeImage.Image_Unit2_Sensor2(preprocessor.U2S2_Image_data,directory)
+    # 2.2 Train, Test 데이터의 SpearmanValue image 도출
 directory = '[03]_image/[02]_SpearmanValue'
-makeImage.Image_SpearmanValue(directory,0)
-makeImage.Image_SpearmanValue(directory,1)
+makeImage.Image_SpearmanValue(preprocessor.Spearman_Image_data,directory,0)
+makeImage.Image_SpearmanValue(preprocessor.Spearman_Image_data,directory,1)
