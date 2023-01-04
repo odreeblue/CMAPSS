@@ -140,6 +140,27 @@ for i in range(1,7):
 directory = './[04]_ANN/Model/'
 postprocessor = postprocess(preprocessor.data,SENSORNUMBER,directory)
 
+    #4.1 Train & Test 데이터에 대한 예측값 도출
 for i in range(1,7):
-    rmse,actual,predictions = postprocessor.evaluation(i)
-    postprocessor.[1].insert(29,'predValue',test_predValue[1])
+    rmse,actual,predictions = postprocessor.evaluation(i,'train')
+    postprocessor.TrainData[i].insert(29,'predValue',predictions)
+
+    rmse,actual,predictions = postprocessor.evaluation(i,'test')
+    postprocessor.TestData[i].insert(29,'predValue',predictions)
+
+    #4.2 Regression Graph 그리기
+train_directory = './[04]_ANN/Train_RegressionGraph/'
+test_directory = './[04]_ANN/Test_RegressionGraph/'
+for i in range(1,7):
+    Train_Y = postprocessor.TrainData[i]['target']
+    Train_Yhat = postprocessor.TrainData[i]['predValue']
+    postprocessor.Regression_Graph(i,Train_Y,Train_Yhat,'train',train_directory)
+
+    Test_Y = postprocessor.TestData[i]['target']
+    Test_Yhat = postprocessor.TestData[i]['predValue']
+    postprocessor.Regression_Graph(i,Test_Y,Test_Yhat,'test',test_directory)
+
+    #4.3 TrainData의 50번, 100번, 200번, 260번 RUL 비교 그래프 그리기
+enginelist=[50,100,200,260]
+directory = './[04]_ANN/Train_RUL_Graph/'
+postprocessor.RUL_Graph(enginelist,directory)
